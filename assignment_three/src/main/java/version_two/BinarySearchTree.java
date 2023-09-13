@@ -213,18 +213,8 @@ public class BinarySearchTree<E extends Comparable<E>> {
             } else {
                 //CASE 3 - both children are !nil
                 Node<E> successor = this.findSuccessor(nodeToRemove);
-                
                 //At this point the stack should point towards the parent of the successor
                 Node<E> successorParent = this.getParent(successor);
-                
-                //REMOVING successor node
-                //Replacing successor parent left child with right child of the successor
-                if(successor.rightChild != nil) {
-                    successorParent.rightChild = successor.rightChild;
-                } else {
-                    successorParent.rightChild = nil;
-                }
-                
                 
                 //Now we traverse back up the stack to the nodeToRemove
                 Node<E> nodePtr = successor;
@@ -235,8 +225,17 @@ public class BinarySearchTree<E extends Comparable<E>> {
                     parentPtr = getParent(nodePtr);
                 }
                 
-                //Removing successor from successor parent
-                successorParent.leftChild = nil;
+                //REMOVING successor node
+                //Replacing successor parent left child with right child of the successor
+                if(successor.rightChild != nil) {
+                    successorParent.rightChild = successor.rightChild;
+                } else {
+                    successorParent.rightChild = nil;
+                }
+                if(successorParent.compareTo(nodeToRemove) != 0) {
+                    //Removing successor from successor parent
+                    successorParent.leftChild = nil;
+                } 
                 
                 //NodePtr is now nodeToRemove
                 //Top of stack is parent of nodePtr
