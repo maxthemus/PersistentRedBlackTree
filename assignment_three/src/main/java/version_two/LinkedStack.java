@@ -55,6 +55,19 @@ public class LinkedStack<E extends Comparable<E>> {
             this.count++;
         }
     }
+    
+    public E peek() {
+        if(this.top != null) {
+            return this.top.element;
+        } else {
+            return null;
+        }
+    }
+    
+    public void clear() {
+        this.top = null;
+        this.count = 0;
+    }
 
     @Override
     public String toString() {

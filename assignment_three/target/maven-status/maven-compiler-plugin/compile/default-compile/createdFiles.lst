@@ -1,6 +1,10 @@
 com/mycompany/assignment_three/BinarySearchTree$Node.class
+version_two/BinarySearchTree$Node.class
+version_two/BinarySearchTree.class
 com/mycompany/assignment_three/BinarySearchTree$TraversalStack.class
+version_two/LinkedStack$Node.class
 com/mycompany/assignment_three/PersistentDynamicRedBlackTree$RedBlackNode.class
+version_two/LinkedStack.class
 com/mycompany/assignment_three/PersistentDynamicRedBlackTree$NodeColour.class
 com/mycompany/assignment_three/BinarySearchTree.class
 com/mycompany/assignment_three/PersistentDynamicRedBlackTree.class
