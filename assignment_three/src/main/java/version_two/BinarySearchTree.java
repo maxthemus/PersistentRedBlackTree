@@ -56,16 +56,17 @@ public class BinarySearchTree<E extends Comparable<E>> {
     }
     
     /** ADDING NODE. */
-    //Returns new root of tree
+    //Returns newlyInserted node
     public Node<E> add(E element) {
-        Node<E> nodeToAdd = new Node<>(element);
+        Node<E> nodeToAdd = createNode(element);
+        startTraversal(); //Stetting up traversal stack
         if(this.root != nil) {
-            startTraversal(); //Stetting up traversal stack
-            return addNode(nodeToAdd, this.root);
+            addNode(nodeToAdd, this.root);
         } else {
             this.root = nodeToAdd;
-            return nodeToAdd;
         }
+        this.addFinished(nodeToAdd);
+        return nodeToAdd;
     }
     
     protected Node<E> addNode(Node<E> nodeToAdd, Node<E> nodePtr) {
@@ -89,7 +90,7 @@ public class BinarySearchTree<E extends Comparable<E>> {
         }
         
         //Node already exists
-        return nodePtr;
+        return nodeToAdd;
     }
     
     
@@ -103,17 +104,20 @@ public class BinarySearchTree<E extends Comparable<E>> {
                 return this.root;
             } else {
                 //Node was found
-                this.removeNode(nodeToRemove);
-                
+                Node<E> replacementNode = this.removeNode(nodeToRemove);
+                if(replacementNode != nil) {
+                    this.removeFinished(replacementNode); //With top of stack is replacement nodes parent node
+                }
             }
         }
         return nil;
     }
     
     
-    //Returns replacement node
+    //Returns node to check
     protected Node<E> removeNode(Node<E> nodeToRemove) {
         //Parent of node to remove is top of stack
+        Node<E> checkNode = nil;
         
         //Cases:
         //1- Both Children nil, swap parent link with nil
@@ -249,6 +253,10 @@ public class BinarySearchTree<E extends Comparable<E>> {
         return nil;
     }
     
+    protected Node<E> createNode(E element) {
+        return new Node<>(element);
+    }
+    
     protected void copyIntoNode(Node<E> copy, Node<E> copyTo) {
         //Check if copy into nil because we don't want to override nil
         if(copyTo == nil) {
@@ -331,6 +339,71 @@ public class BinarySearchTree<E extends Comparable<E>> {
             return findTreeMinimum(root.leftChild);
         }
         return root;
+    }
+    
+    /**
+     * Node Mutation Methods.
+     */
+    //Rotates node, promoting nodes right child to its parent
+    //When function is called we assume that parent of node is on top of the stack
+    //on Return node parent will be on top of stack
+    protected void leftRotateNode(Node<E> node) {
+        Node<E> parentNode = this.getParent(node); //Will peek the stack to check if parent is setup correctly
+        
+        //If executing then everything is setup correctly
+        Node<E> promotionNode = node.rightChild;
+        if(promotionNode != nil) {
+            node.rightChild = promotionNode.leftChild; //Moving inside node
+            if(parentNode == nil) {
+                this.root = promotionNode;
+            } else {
+                int compareValue = node.compareTo(parentNode);
+                if(compareValue < 0) {
+                    //Left child
+                    parentNode.leftChild = promotionNode;
+                } else if(0 < compareValue) {
+                    parentNode.rightChild = promotionNode;
+                } else {
+                    System.out.println("Rotating same node");
+                    System.exit(1);
+                }
+            }
+            promotionNode.leftChild = node;
+
+            //Now we need to clean up the stack by pushing the promotion node
+            this.nodeTraversed(promotionNode); //promotion node is parent of node
+        }      
+    }
+
+    //Rotates node, promoting nodes left child to its parent
+    //When function is called we assume that parent of node is on top of the stack
+    //on Return node parent will be on top of stack
+    protected void rightRotateNode(Node<E> node) {
+        Node<E> parentNode = this.getParent(node); //Will peek the stack to check if parent is setup correctly
+        
+        //If executing then everything is setup correctly
+        Node<E> promotionNode = node.leftChild;
+        if(promotionNode != nil) {
+            node.leftChild = promotionNode.rightChild; //Moving inside node
+            if(parentNode == nil) {
+                this.root = promotionNode;
+            } else {
+                int compareValue = node.compareTo(parentNode);
+                if(compareValue < 0) {
+                    //Left child
+                    parentNode.leftChild = promotionNode;
+                } else if(0 < compareValue) {
+                    parentNode.rightChild = promotionNode;
+                } else {
+                    System.out.println("Rotating same node");
+                    System.exit(1);
+                }
+            }
+            promotionNode.rightChild = node;
+
+            //Now we need to clean up the stack by pushing the promotion node
+            this.nodeTraversed(promotionNode); //promotion node is parent of node
+        }      
     }
     
     
@@ -425,16 +498,19 @@ public class BinarySearchTree<E extends Comparable<E>> {
     }
                 
     
-    private void nodeTraversed(Node<E> node) {
+    protected void nodeTraversed(Node<E> node) {
         this.stack.push(node);
     }
     
-    private void nodeFinished(Node<E> node) {
-        
+    
+    protected void addFinished(Node<E> node) {
+        return;
     }
     
-    
-    
+    protected void removeFinished(Node<E> node) {
+        return;
+    }
+  
     
     //Protected inner class
     protected class Node<E extends Comparable<E>> implements Comparable<Node<E>> {
@@ -475,38 +551,22 @@ public class BinarySearchTree<E extends Comparable<E>> {
     public static void main(String[] args) {
         BinarySearchTree<Integer> tree = new BinarySearchTree<>();
         
-        tree.add(10);
-        tree.add(15);
-        tree.add(14);
-        tree.add(20);
-        tree.add(19);
-        tree.add(18);
-        System.out.println(tree);
+        tree.add(3);
+        tree.add(2);
+        tree.add(1);
+        tree.add(0);
         
-        System.out.println("+----------------+");
-        
-        tree.remove(15);
         System.out.println(tree);
         tree.printStack();
         
         System.out.println("+----------------+");
         
-        tree.remove(10);
+        tree.remove(2);
+        
         System.out.println(tree);
         tree.printStack();
         
         System.out.println("+----------------+");
-        
-        tree.remove(18);
-        System.out.println(tree);
-        tree.printStack();
-        
-        System.out.println("+----------------+");
-        
-        tree.remove(19);
-        System.out.println(tree);
-        tree.printStack();
-
     }
     
 }

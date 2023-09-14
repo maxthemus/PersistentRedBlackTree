@@ -206,6 +206,7 @@ public class BinarySearchTree<E extends Comparable> {
         return rootNode;
     }
     
+    
     /** HOOK METHODS. */
     protected Node<E> duplicateNode(Node<E> node) {
         Node<E> temp = new Node<>(node.element);
