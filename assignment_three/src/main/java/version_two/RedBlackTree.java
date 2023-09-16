@@ -22,7 +22,7 @@ public class RedBlackTree<E extends Comparable<E>> extends BinarySearchTree<E> {
     @Override
     protected void removeFinished(Node<E> node) {
         RedBlackNode<E> nodePtr = (RedBlackNode<E>)node;
-        RedBlackNode<E> parentNode = (RedBlackNode<E>) this.traverseToParent(nodePtr);
+        RedBlackNode<E> parentNode = (RedBlackNode<E>) this.getParent(nodePtr);
         
         while(nodePtr.compareTo(this.root) != 0 && nodePtr.colour == NodeColour.BLACK) {
             //Checking if nodePtr is left child
@@ -45,8 +45,9 @@ public class RedBlackTree<E extends Comparable<E>> extends BinarySearchTree<E> {
                         siblingNode.colour = NodeColour.RED;
 
                     }
-                    nodePtr = parentNode; //Moving to parent node. top of stack should be parent of nodePtr now
-                    parentNode = (RedBlackNode<E>) this.traverseToParent(nodePtr); //Re assigning parent node
+                    nodePtr = (RedBlackNode<E>)this.search(parentNode.element); //Moving to parent node. top of stack should be parent of nodePtr now
+                    
+                    parentNode = (RedBlackNode<E>) (this.getParent(nodePtr)); //Getting parent node
                 } else {
                     if(siblingNode.rightChild == nil || ((RedBlackNode<E>)siblingNode.rightChild).colour == NodeColour.BLACK) {
                         //CASE THREE
@@ -86,7 +87,7 @@ public class RedBlackTree<E extends Comparable<E>> extends BinarySearchTree<E> {
 
                     }
                     nodePtr = parentNode; //Moving to parent node. top of stack should be parent of nodePtr now
-                    parentNode = (RedBlackNode<E>) this.traverseToParent(nodePtr); //Re assigning parent node
+                    parentNode = (RedBlackNode<E>) (this.getParent(nodePtr)); //Re assigning parent node
                 } else {
                     if(siblingNode.leftChild == nil || ((RedBlackNode<E>)siblingNode.leftChild).colour == NodeColour.BLACK) {
                         //CASE THREE
@@ -113,7 +114,7 @@ public class RedBlackTree<E extends Comparable<E>> extends BinarySearchTree<E> {
             }
         }
 //        nodePtr.colour = NodeColour.BLACK;
-        ((RedBlackNode<E>)this.root).colour = NodeColour.BLACK; //Setting root node to black
+        nodePtr.colour = NodeColour.BLACK; //Setting root node to black
     }
 
     @Override
@@ -126,15 +127,15 @@ public class RedBlackTree<E extends Comparable<E>> extends BinarySearchTree<E> {
         
         
         while(parentNode != nil && parentNode.colour == NodeColour.RED) {
-            int compareValue = parentNode.compareTo(this.getParent(parentNode));
+            int compareValue = parentNode.compareTo(this.getParentStack(parentNode));
             if(compareValue < 0) {
                 //Parent is left child
-                RedBlackNode<E> uncle = (RedBlackNode<E>) this.getParent(parentNode).rightChild;
+                RedBlackNode<E> uncle = (RedBlackNode<E>) this.getParentStack(parentNode).rightChild;
                 if(uncle != nil && uncle.colour == NodeColour.RED) {
                     //CASE ONE
                     parentNode.colour = NodeColour.BLACK;
                     uncle.colour = NodeColour.BLACK;
-                    ((RedBlackNode<E>)this.getParent(parentNode)).colour = NodeColour.RED; //Making colour of great parent RED
+                    ((RedBlackNode<E>)this.getParentStack(parentNode)).colour = NodeColour.RED; //Making colour of great parent RED
                     
                     //Now we need to make nodePtr into gparent which is top of stack
                     nodePtr = (RedBlackNode<E>) this.traverseToParent(parentNode);
@@ -157,12 +158,12 @@ public class RedBlackTree<E extends Comparable<E>> extends BinarySearchTree<E> {
                 }
             } else if(0 < compareValue) {
                 //Parent is right child
-                RedBlackNode<E> uncle = (RedBlackNode<E>) this.getParent(parentNode).leftChild;
+                RedBlackNode<E> uncle = (RedBlackNode<E>) this.getParentStack(parentNode).leftChild;
                 if(uncle != nil && uncle.colour == NodeColour.RED) {
                     //CASE ONE
                     parentNode.colour = NodeColour.BLACK;
                     uncle.colour = NodeColour.BLACK;
-                    ((RedBlackNode<E>)this.getParent(parentNode)).colour = NodeColour.RED; //Making colour of great parent RED
+                    ((RedBlackNode<E>)this.getParentStack(parentNode)).colour = NodeColour.RED; //Making colour of great parent RED
                     
                     //Now we need to make nodePtr into gparent which is top of stack
                     nodePtr = (RedBlackNode<E>) this.traverseToParent(parentNode);
@@ -267,17 +268,17 @@ public class RedBlackTree<E extends Comparable<E>> extends BinarySearchTree<E> {
         
         System.out.println("+----------------+");
         
+        tree.remove(7);
+        System.out.println(tree);
+        
+        System.out.println("+----------------+");
+        
         tree.remove(6);
         System.out.println(tree);
         
         System.out.println("+----------------+");
         
-        tree.remove(5);
-        System.out.println(tree);
-        
-        System.out.println("+----------------+");
-        
-        tree.remove(4);
+        tree.remove(1);
         System.out.println(tree);
     }
 }
