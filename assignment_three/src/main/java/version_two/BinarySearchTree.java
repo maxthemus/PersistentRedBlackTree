@@ -62,11 +62,13 @@ public class BinarySearchTree<E extends Comparable<E>> {
     public Node<E> add(E element) {
         Node<E> nodeToAdd = createNode(element);
         startTraversal(); //Stetting up traversal stack
+        this.startCopyStack();
         if(this.root != nil) {
             addNode(nodeToAdd, this.root);
         } else {
             this.root = nodeToAdd;
         }
+        this.copyTree();
         this.addFinished(nodeToAdd);
         return nodeToAdd;
     }
@@ -75,17 +77,21 @@ public class BinarySearchTree<E extends Comparable<E>> {
         int compareValue = nodeToAdd.compareTo(nodePtr);
         if(compareValue < 0) {
             if(nodePtr.leftChild == nil) {
+                this.nodeForCopy(nodePtr);
                 this.nodeTraversed(nodePtr); //Adding parent to stack
                 nodePtr.leftChild = nodeToAdd;
             } else {
+                this.nodeForCopy(nodePtr);
                 this.nodeTraversed(nodePtr); //Adding parent to stack
                 return addNode(nodeToAdd, nodePtr.leftChild);
             }
         } else if(0 < compareValue) {
             if(nodePtr.rightChild == nil) {
+                this.nodeForCopy(nodePtr);
                 this.nodeTraversed(nodePtr); //Adding parent to stack
                 nodePtr.rightChild = nodeToAdd;
             } else {
+                this.nodeForCopy(nodePtr);
                 this.nodeTraversed(nodePtr); //Adding parent to stack
                 return addNode(nodeToAdd, nodePtr.rightChild);
             }
@@ -100,6 +106,7 @@ public class BinarySearchTree<E extends Comparable<E>> {
     //Returns new root node of tree
     public Node<E> remove(E element) {
         if(this.root != nil) {
+            this.startCopyStack();
             Node<E> nodeToRemove = this.search(element);
             if(nodeToRemove == nil) {
                 //Node not found
@@ -198,6 +205,15 @@ public class BinarySearchTree<E extends Comparable<E>> {
 
         return tempString;
     }
+    
+    public String treeToString(Node<E> rootNode) {
+        if (rootNode == nil) {
+            return "()";
+        }
+        String tempString = nodeToString(rootNode);
+
+        return tempString;
+    }
 
     protected String nodeToString(Node<E> currentNode) {
         //Inorder traversal of tree using recursion
@@ -240,6 +256,7 @@ public class BinarySearchTree<E extends Comparable<E>> {
         } 
         
         this.nodeTraversed(root);
+        this.nodeForCopy(root);
         return this.findTreeMinimum(root.rightChild);
     }
     
@@ -251,6 +268,7 @@ public class BinarySearchTree<E extends Comparable<E>> {
     private Node<E> findTreeMaximum(Node<E> root) {
         while(root.rightChild.compareTo(nil) != 0) {
             this.nodeTraversed(root);
+            this.nodeForCopy(root);
             return findTreeMaximum(root.rightChild);
         }
         return root;
@@ -259,8 +277,10 @@ public class BinarySearchTree<E extends Comparable<E>> {
     private Node<E> findTreeMinimum(Node<E> root) {
         while(root.leftChild != nil) {
             this.nodeTraversed(root);
+            this.nodeForCopy(root);
             return findTreeMinimum(root.leftChild);
         }
+        this.nodeForCopy(root);
         return root;
     }
     
@@ -444,6 +464,10 @@ public class BinarySearchTree<E extends Comparable<E>> {
         
         this.stack.push(nil);
     }
+    
+    protected void startCopyStack() {
+        return;
+    }
                 
     
     protected void nodeTraversed(Node<E> node) {
@@ -456,6 +480,14 @@ public class BinarySearchTree<E extends Comparable<E>> {
     }
     
     protected void removeFinished(Node<E> node) {
+        return;
+    }
+    
+    protected Node<E> copyTree() {
+        return nil;
+    }
+    
+    protected void nodeForCopy(Node<E> node) {
         return;
     }
   
@@ -499,17 +531,20 @@ public class BinarySearchTree<E extends Comparable<E>> {
     public static void main(String[] args) {
         BinarySearchTree<Integer> tree = new BinarySearchTree<>();
         
-        tree.add(3);
-        tree.add(2);
-        tree.add(1);
         tree.add(0);
+        tree.add(4);
+        tree.add(10);
+        tree.add(3);
+        
+        tree.add(9);
+        tree.add(8);
         
         System.out.println(tree);
         tree.printStack();
         
         System.out.println("+----------------+");
         
-        tree.remove(2);
+        tree.remove(4);
         
         System.out.println(tree);
         tree.printStack();

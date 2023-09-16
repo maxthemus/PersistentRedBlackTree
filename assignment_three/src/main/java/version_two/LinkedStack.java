@@ -8,7 +8,7 @@ package version_two;
  *
  * @author max
  */
-public class LinkedStack<E extends Comparable<E>> {
+public class LinkedStack<E> {
     //Fields
     private Node<E> top;
     private int count;
@@ -88,7 +88,7 @@ public class LinkedStack<E extends Comparable<E>> {
     
     
     //Private inner class
-    private class Node<E extends Comparable<E>> {
+    private class Node<E> {
         //fields
         public E element;
         public Node<E> next;
@@ -97,12 +97,7 @@ public class LinkedStack<E extends Comparable<E>> {
         public Node(E element) {
             this.element = element;
         }
-        
-        //Methods
-        public int compareTo(Node<E> node) {
-            return this.element.compareTo(node.element);
-        }
-        
+                
         @Override
         public String toString() {
             return this.element.toString();

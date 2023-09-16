@@ -4,6 +4,8 @@
  */
 package version_two;
 
+import java.awt.Color;
+
 /**
  *
  * @author maxthemus
@@ -205,6 +207,22 @@ public class RedBlackTree<E extends Comparable<E>> extends BinarySearchTree<E> {
     protected Node<E> createNode(E element) {
         return new RedBlackNode<>(element);
     }
+
+//    @Override
+//    protected void changeNodeColor(Node<E> node, Color color) {
+//        ((RedBlackNode<E>)node).colour = (color == Color.BLACK ? NodeColour.BLACK : NodeColour.RED);
+//    }
+//
+//    @Override
+//    protected boolean checkNodeColor(Node<E> node, Color color) {
+//        if(color == Color.BLACK) {
+//            return ((RedBlackNode<E>)node).colour == NodeColour.BLACK;
+//        } else {
+//            return ((RedBlackNode<E>)node).colour == NodeColour.RED;
+//        }
+//    }
+    
+    
     
     
     //Private inner class
@@ -221,6 +239,8 @@ public class RedBlackTree<E extends Comparable<E>> extends BinarySearchTree<E> {
         
         public RedBlackNode(Node<E> node) {
             super(node.element);
+            this.leftChild = node.leftChild;
+            this.rightChild = node.rightChild;
             this.colour = NodeColour.RED; //New nodes are RED by default.
         }
         

@@ -4,6 +4,7 @@ version_two/LinkedStack$Node.class
 com/mycompany/assignment_three/PersistentDynamicRedBlackTree$RedBlackNode.class
 version_two/LinkedStack.class
 version_two/RedBlackTree$NodeColour.class
+version_two/PersistentTree.class
 com/mycompany/assignment_three/BinarySearchTree.class
 com/mycompany/assignment_three/PersistentDynamicRedBlackTree.class
 com/mycompany/assignment_three/PersistentDynamicTree.class
