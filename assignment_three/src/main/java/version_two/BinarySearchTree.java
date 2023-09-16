@@ -4,6 +4,8 @@
  */
 package version_two;
 
+import java.awt.Color;
+
 /**
  *
  * @author max
@@ -30,7 +32,7 @@ public class BinarySearchTree<E extends Comparable<E>> {
             return nil;
         } else {
             startTraversal(); //Stetting up traversal stack
-            return searchNode(element, root);
+            return this.searchNode(element, root);
         }
     }
 
@@ -103,6 +105,9 @@ public class BinarySearchTree<E extends Comparable<E>> {
                 //Node not found
                 return this.root;
             } else {
+                //Make a copy of tree
+                Node<E> oldRoot = this.copyTree();
+                
                 //Node was found
                 Node<E> replacementNode = this.removeNode(nodeToRemove);
                 if(replacementNode != nil) {
@@ -110,7 +115,7 @@ public class BinarySearchTree<E extends Comparable<E>> {
                 }
             }
         }
-        return nil;
+        return this.root;
     }
     
     
@@ -118,139 +123,57 @@ public class BinarySearchTree<E extends Comparable<E>> {
     protected Node<E> removeNode(Node<E> nodeToRemove) {
         //Parent of node to remove is top of stack
         Node<E> checkNode = nil;
+        Node<E> nodePtr = nodeToRemove; //z
+        Node<E> replacementNode = nil;
+        //Parent is on top of stack
         
-        //Cases:
-        //1- Both Children nil, swap parent link with nil
-        //2- One child nil, swap parent link with not nil child
-        //3- Both Children not nil, swap parent link with successor
-        
-        //CASE 1
-        if(nodeToRemove.leftChild == nil && nodeToRemove.rightChild == nil) {
-            Node<E> parentNode = this.getParent(nodeToRemove);
+        if(nodePtr.leftChild != nil && nodePtr.rightChild != nil) {
+            replacementNode = this.findSuccessor(nodePtr); //r
             
-            //Checking if parent node is root
-            if(parentNode != nil) {
-                int compareValue = nodeToRemove.compareTo(parentNode);
-                if (compareValue < 0) {
-                    parentNode.leftChild = nil;
-                    return nil;
-                } else if (0 < compareValue) {
-                    parentNode.rightChild = nil;
-                    return nil;
-                } else {
-                    System.out.println("Invalid remove parent is same as removal node");
-                    System.exit(1);
-                    return nil;
-                }
+            Node<E> replacementParent =  this.getParent(replacementNode);
+            replacementParent.leftChild = replacementNode.rightChild;
+            if(this.checkNodeColor(replacementNode, Color.RED)) {
+                checkNode = replacementNode.rightChild;
+            }
+            
+            replacementNode.leftChild = nodePtr.leftChild;
+            replacementNode.rightChild = nodePtr.rightChild;
+        } else if(nodePtr.rightChild != nil || nodePtr.leftChild != nil) {
+            //One child
+            if(nodePtr.leftChild != nil) {
+                replacementNode = nodePtr.leftChild;
             } else {
-                this.root = nil;
-                return nil;
+                replacementNode = nodePtr.rightChild;
+            }
+            if(this.checkNodeColor(nodePtr, Color.BLACK)) {
+                checkNode = replacementNode;
             }
         } else {
-            //CASE 2
-            if(nodeToRemove.leftChild == nil && nodeToRemove.rightChild != nil) {
-                Node<E> parentNode = this.getParent(nodeToRemove);
-                Node<E> replacementNode = nodeToRemove.rightChild;
-                
-                //Checking if node to remove is the root node
-                if(parentNode != nil) {
-                    //Finding what child nodeToRemove is 
-                    if (parentNode.leftChild != nil) {
-                        if (parentNode.leftChild.compareTo(nodeToRemove) == 0) {
-                            //nodeToRemove == LEFT CHILD
-
-                            //inserting replacement node
-                            parentNode.leftChild = replacementNode;
-                            return replacementNode;
-                        }
-                    } else if (parentNode.rightChild != nil) {
-                        if (parentNode.rightChild.compareTo(nodeToRemove) == 0) {
-                            //nodeToRemove == RIGHT CHILD
-
-                            //inserting replacement node
-                            parentNode.rightChild = replacementNode;
-                            return replacementNode;
-                        }
-                    } else {
-                        System.out.println("INVALID STACK");
-                        System.exit(1);
-                        return nil;
-                    }
-                } else {
-                    //Node to remove is root node
-                    this.root = replacementNode;
-                    return replacementNode;
-                }
-            } else if(nodeToRemove.rightChild == nil && nodeToRemove.leftChild != nil) {
-                Node<E> parentNode = this.getParent(nodeToRemove);
-                Node<E> replacementNode = nodeToRemove.leftChild;
-                
-                //Checking if node to remove is the root node
-                if(parentNode != nil) {
-                    //Finding what child nodeToRemove is 
-                    if (parentNode.leftChild != nil) {
-                        if (parentNode.leftChild.compareTo(nodeToRemove) == 0) {
-                            //nodeToRemove == LEFT CHILD
-
-                            //inserting replacement node
-                            parentNode.leftChild = replacementNode;
-                            return replacementNode;
-                        }
-                    } else if (parentNode.rightChild != nil) {
-                        if (parentNode.rightChild.compareTo(nodeToRemove) == 0) {
-                            //nodeToRemove == RIGHT CHILD
-
-                            //inserting replacement node
-                            parentNode.rightChild = replacementNode;
-                            return replacementNode;
-                        }
-                    } else {
-                        System.out.println("INVALID STACK");
-                        System.exit(1);
-                        return nil;
-                    }
-                } else {
-                    //Node to remove is root node
-                    this.root = replacementNode;
-                    return replacementNode;
-                }
-            } else {
-                //CASE 3 - both children are !nil
-                Node<E> successor = this.findSuccessor(nodeToRemove);
-                //At this point the stack should point towards the parent of the successor
-                Node<E> successorParent = this.getParent(successor);
-                
-                //Now we traverse back up the stack to the nodeToRemove
-                Node<E> nodePtr = successor;
-                Node<E> parentPtr = successorParent;
-                //Traversal while nodePtr != nodeToRemove OR while nodePtr != rootNode
-                while(nodePtr.compareTo(nodeToRemove) != 0 && nodePtr != this.root) {
-                    nodePtr = traverseToParent(nodePtr); //Moving parent of parent into temp
-                    parentPtr = getParent(nodePtr);
-                }
-                
-                //REMOVING successor node
-                //Replacing successor parent left child with right child of the successor
-                if(successor.rightChild != nil) {
-                    successorParent.rightChild = successor.rightChild;
-                } else {
-                    successorParent.rightChild = nil;
-                }
-                if(successorParent.compareTo(nodeToRemove) != 0) {
-                    //Removing successor from successor parent
-                    successorParent.leftChild = nil;
-                } 
-                
-                //NodePtr is now nodeToRemove
-                //Top of stack is parent of nodePtr
-                this.copyIntoNode(successor, nodeToRemove);      
-                
-                return nodeToRemove;
+            replacementNode = nil;
+            if(this.checkNodeColor(nodePtr, Color.BLACK)) {
+                checkNode = this.getParent(nodePtr);
             }
         }
-        System.out.println("IDK WHY HERE");
-        System.exit(1);
-        return nil;
+
+        //Updating parent node
+        Node<E> parentNode = this.getParent(nodePtr);
+        if(parentNode == nil) {
+            this.root = replacementNode;
+        } else {
+            int compareValue = nodePtr.compareTo(parentNode);
+            if(compareValue < 0) {
+                //Left child
+                parentNode.leftChild = replacementNode;
+            } else if(0 < compareValue) {
+                //Right child
+                parentNode.rightChild = replacementNode;
+            } else {
+                System.out.println("ERROR in remove");
+                System.exit(1);
+            }
+        }
+        
+        return checkNode;
     }
     
     protected Node<E> createNode(E element) {
@@ -348,7 +271,7 @@ public class BinarySearchTree<E extends Comparable<E>> {
     //When function is called we assume that parent of node is on top of the stack
     //on Return node parent will be on top of stack
     protected void leftRotateNode(Node<E> node) {
-        Node<E> parentNode = this.getParent(node); //Will peek the stack to check if parent is setup correctly
+        Node<E> parentNode = this.getParentStack(node); //Will peek the stack to check if parent is setup correctly
         
         //If executing then everything is setup correctly
         Node<E> promotionNode = node.rightChild;
@@ -379,7 +302,7 @@ public class BinarySearchTree<E extends Comparable<E>> {
     //When function is called we assume that parent of node is on top of the stack
     //on Return node parent will be on top of stack
     protected void rightRotateNode(Node<E> node) {
-        Node<E> parentNode = this.getParent(node); //Will peek the stack to check if parent is setup correctly
+        Node<E> parentNode = this.getParentStack(node); //Will peek the stack to check if parent is setup correctly
         
         //If executing then everything is setup correctly
         Node<E> promotionNode = node.leftChild;
@@ -406,13 +329,38 @@ public class BinarySearchTree<E extends Comparable<E>> {
         }      
     }
     
+    protected boolean checkNodeColor(Node<E> node, Color color) {
+        return false;
+    }
+    
+    protected void changeNodeColor(Node<E> node, Color color) {
+        return;
+    }
+    
     
     /** STACK METHODS. */
     public void printStack() {
         System.out.println(this.stack.toString());
     }
     
+    //Will return nil if root NULL if node doesn't exist.
+    //Grand parent node will be on top of stack
     public Node<E> getParent(Node<E> node) {
+        if(this.root.compareTo(node) == 0) {
+            return nil; //because node is root
+        } else {
+            Node<E> searchNode = this.search(node.element);
+            if(searchNode == nil) {
+                //Node doesn't exist
+                return null;
+            } else {
+                Node<E> parentNode = this.stack.pop();
+                return parentNode;
+            }
+        }
+    }
+    
+    public Node<E> getParentStack(Node<E> node) {
         try {
             Node<E> parent = this.stack.peek();
             
